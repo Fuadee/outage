@@ -1,11 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { isJobStatus, STATUSES } from "@/lib/types";
 
 export async function createOutageJob(formData: FormData) {
-  const supabase = getSupabaseServerClient();
+  const supabase = createServerClient();
   const title = String(formData.get("title") ?? "");
   const areaGroup = String(formData.get("area_group") ?? "");
   const startTime = formData.get("start_time")?.toString() || null;

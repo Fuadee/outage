@@ -7,11 +7,7 @@ const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.some((path) => pathname === path);
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-
-  if (pathname.startsWith("/api")) {
-    return NextResponse.next();
-  }
+  const { pathname, search } = request.nextUrl;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -39,22 +35,31 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getSession();
 
   const isAuthenticated = Boolean(session);
+  const isLoginRoute = pathname === "/login";
 
   if (!isAuthenticated && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    const nextPath = `${pathname}${search}`;
+    url.searchParams.set("next", nextPath);
     return NextResponse.redirect(url);
   }
 
-  if (isAuthenticated && (pathname === "/" || pathname === "/login")) {
+  if (isAuthenticated && isLoginRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
+    url.searchParams.delete("next");
     return NextResponse.redirect(url);
   }
 
-  if (pathname.startsWith("/admin")) {
-    const role = session?.user?.app_metadata?.role;
-    if (role !== "admin") {
+  if (isAuthenticated && pathname.startsWith("/admin")) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session?.user.id)
+      .single();
+
+    if (error || data?.role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
