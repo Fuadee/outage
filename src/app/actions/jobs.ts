@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { STATUSES } from "@/lib/types";
+import { isJobStatus, STATUSES } from "@/lib/types";
 
 export async function createOutageJob(formData: FormData) {
   const supabase = getSupabaseServerClient();
@@ -11,9 +11,7 @@ export async function createOutageJob(formData: FormData) {
   const startTime = formData.get("start_time")?.toString() || null;
   const endTime = formData.get("end_time")?.toString() || null;
   const statusInput = String(formData.get("status") ?? STATUSES[0]);
-  const status = STATUSES.includes(statusInput)
-    ? statusInput
-    : STATUSES[0];
+  const status = isJobStatus(statusInput) ? statusInput : STATUSES[0];
 
   if (!title || !areaGroup) {
     return;

@@ -10,6 +10,11 @@ export const STATUSES = [
 
 export type JobStatus = (typeof STATUSES)[number];
 
+const STATUS_SET = new Set<string>(STATUSES);
+
+export const isJobStatus = (value: unknown): value is JobStatus =>
+  typeof value === "string" && STATUS_SET.has(value);
+
 export const ROLES = ["admin", "dispatcher", "supervisor", "onsite"] as const;
 
 export type UserRole = (typeof ROLES)[number];
