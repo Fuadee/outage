@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
@@ -8,6 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -23,7 +25,8 @@ export default function LoginPage() {
     if (error) {
       setMessage(error.message);
     } else {
-      setMessage("Signed in successfully. Navigate to the dashboard.");
+      setMessage("Signed in successfully. Redirecting to the dashboard.");
+      router.replace("/dashboard");
     }
 
     setLoading(false);

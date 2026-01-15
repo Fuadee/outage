@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Krabi Outage App",
@@ -14,38 +15,62 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-slate-950 text-slate-100">
-        <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-8">
-          <header className="flex flex-wrap items-center justify-between gap-4">
-            <div>
+        <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-8 px-6 py-8 lg:flex-row">
+          <aside className="flex w-full flex-col gap-8 rounded-3xl border border-slate-800 bg-slate-900/40 p-6 lg:w-64">
+            <div className="space-y-2">
               <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
                 Krabi Outage App
               </p>
-              <h1 className="text-2xl font-semibold text-white">
+              <h1 className="text-xl font-semibold text-white">
                 Outage Job Coordination
               </h1>
             </div>
-            <nav className="flex items-center gap-3 text-sm text-slate-200">
-              <a className="rounded-full border border-slate-700 px-4 py-2" href="/">
+            <nav className="flex flex-col gap-2 text-sm text-slate-200">
+              <Link
+                className="rounded-xl border border-slate-700 px-4 py-2 transition hover:border-slate-500"
+                href="/"
+              >
                 Overview
-              </a>
-              <a
-                className="rounded-full border border-slate-700 px-4 py-2"
+              </Link>
+              <Link
+                className="rounded-xl border border-slate-700 px-4 py-2 transition hover:border-slate-500"
                 href="/dashboard"
               >
                 Dashboard
-              </a>
-              <a
-                className="rounded-full border border-slate-700 px-4 py-2"
-                href="/login"
+              </Link>
+              <Link
+                className="rounded-xl border border-slate-700 px-4 py-2 transition hover:border-slate-500"
+                href="/admin"
               >
-                Sign in
-              </a>
+                Admin
+              </Link>
             </nav>
-          </header>
-          <main className="mt-10 flex-1">{children}</main>
-          <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">
-            Built with Next.js App Router, Tailwind, and Supabase.
-          </footer>
+            <div className="mt-auto space-y-3 text-sm text-slate-400">
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                Account
+              </p>
+              <div className="flex flex-col gap-2">
+                <Link
+                  className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 transition hover:border-slate-500"
+                  href="/login"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  className="rounded-xl border border-slate-700 px-4 py-2 text-slate-200 transition hover:border-slate-500"
+                  href="/logout"
+                >
+                  Sign out
+                </Link>
+              </div>
+            </div>
+          </aside>
+          <div className="flex min-h-[calc(100vh-4rem)] flex-1 flex-col">
+            <main className="flex-1">{children}</main>
+            <footer className="mt-12 border-t border-slate-800 pt-6 text-xs text-slate-500">
+              Built with Next.js App Router, Tailwind, and Supabase.
+            </footer>
+          </div>
         </div>
       </body>
     </html>
