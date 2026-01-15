@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSupabaseRouteHandlerClient } from "@/lib/supabase/server";
-import { STATUSES } from "@/lib/types";
+import { isJobStatus, STATUSES } from "@/lib/types";
 
 export async function GET() {
   const supabase = getSupabaseRouteHandlerClient();
@@ -30,9 +30,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Missing title or area_group" }, { status: 400 });
   }
 
-  const status = STATUSES.includes(body.status ?? "")
-    ? body.status
-    : STATUSES[0];
+  const status = isJobStatus(body.status) ? body.status : STATUSES[0];
 
   const { data, error } = await supabase
     .from("outage_jobs")
