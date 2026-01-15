@@ -26,6 +26,11 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   onsite: "Onsite"
 };
 
+const ROLE_SET = new Set<string>(ROLES);
+
+export const isUserRole = (value: unknown): value is UserRole =>
+  typeof value === "string" && ROLE_SET.has(value);
+
 export type OutageJob = {
   id: string;
   title: string;
