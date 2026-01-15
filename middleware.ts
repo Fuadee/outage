@@ -2,9 +2,27 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 const PUBLIC_PATHS = ["/login"];
+const STATIC_PATHS = [
+  "/favicon.ico",
+  "/_next",
+  "/_next/static",
+  "/_next/image"
+];
 
 const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.some((path) => pathname === path);
+const isStaticPath = (pathname: string) =>
+  STATIC_PATHS.some((path) => pathname === path || pathname.startsWith(path));
+
+const setDebugHeaders = (
+  response: NextResponse,
+  pathname: string,
+  isAuthed: boolean
+) => {
+  response.headers.set("x-auth-state", isAuthed ? "authed" : "unauthed");
+  response.headers.set("x-path", pathname);
+  return response;
+};
 
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
@@ -31,42 +49,43 @@ export async function middleware(request: NextRequest) {
   });
 
   const {
-    data: { session }
-  } = await supabase.auth.getSession();
+    data: { user }
+  } = await supabase.auth.getUser();
 
-  const isAuthenticated = Boolean(session);
+  const isAuthenticated = Boolean(user);
   const isLoginRoute = pathname === "/login";
+  const isStaticRoute = isStaticPath(pathname);
 
-  if (!isAuthenticated && !isPublicPath(pathname)) {
+  if (!isAuthenticated && !isPublicPath(pathname) && !isStaticRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     const nextPath = `${pathname}${search}`;
     url.searchParams.set("next", nextPath);
-    return NextResponse.redirect(url);
+    return setDebugHeaders(NextResponse.redirect(url), pathname, false);
   }
 
   if (isAuthenticated && isLoginRoute) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.searchParams.delete("next");
-    return NextResponse.redirect(url);
+    return setDebugHeaders(NextResponse.redirect(url), pathname, true);
   }
 
   if (isAuthenticated && pathname.startsWith("/admin")) {
     const { data, error } = await supabase
       .from("profiles")
       .select("role")
-      .eq("id", session?.user.id)
+      .eq("id", user?.id)
       .single();
 
     if (error || data?.role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
-      return NextResponse.redirect(url);
+      return setDebugHeaders(NextResponse.redirect(url), pathname, true);
     }
   }
 
-  return response;
+  return setDebugHeaders(response, pathname, isAuthenticated);
 }
 
 export const config = {

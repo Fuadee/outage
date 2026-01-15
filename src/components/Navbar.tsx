@@ -2,11 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-type NavbarProps = {
-  email: string;
-};
-
-export default function Navbar({ email }: NavbarProps) {
+export default function Navbar() {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -17,7 +13,7 @@ export default function Navbar({ email }: NavbarProps) {
 
   return (
     <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950/80 px-6 py-4">
-      <p className="text-sm text-slate-200">Logged in as: {email}</p>
+      <div />
       <button
         type="button"
         onClick={handleLogout}
