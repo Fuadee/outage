@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getSupabaseRouteHandlerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 import { isJobStatus, STATUSES } from "@/lib/types";
 
 export async function GET() {
-  const supabase = getSupabaseRouteHandlerClient();
+  const supabase = createServerClient();
   const { data, error } = await supabase
     .from("outage_jobs")
     .select("id,title,status,area_group,start_time,end_time,created_at")
@@ -17,7 +17,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const supabase = getSupabaseRouteHandlerClient();
+  const supabase = createServerClient();
   const body = (await request.json()) as {
     title?: string;
     area_group?: string;
