@@ -1,20 +1,20 @@
 import { getSupabaseServerClient } from "@/lib/supabase/server";
-import { ROLE_LABELS, STATUSES } from "@/lib/types";
+import { isUserRole, ROLE_LABELS, STATUSES } from "@/lib/types";
 import { createOutageJob } from "@/app/actions/jobs";
 
 export default async function DashboardPage() {
   const supabase = getSupabaseServerClient();
   const { data: sessionData } = await supabase.auth.getSession();
-  const role =
-    sessionData.session?.user.app_metadata?.role ?? "dispatcher";
+  const roleValue = sessionData.session?.user.app_metadata?.role;
+  const role = isUserRole(roleValue) ? roleValue : "dispatcher";
 
   return (
     <section className="space-y-10">
       <header className="space-y-2">
         <h2 className="text-2xl font-semibold text-white">Operations dashboard</h2>
         <p className="text-sm text-slate-400">
-          Logged in as {ROLE_LABELS[role] ?? role}. Assign and monitor outage jobs
-          across teams.
+          Logged in as {ROLE_LABELS[role]}. Assign and monitor outage jobs across
+          teams.
         </p>
       </header>
 
